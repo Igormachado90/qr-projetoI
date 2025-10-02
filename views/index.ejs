@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 Servidor de Arquivos com QR Codes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .file-url {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .qr-code img {
+            max-width: 200px;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+
+        .no-qr {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border: 2px dashed #ddd;
+        }
+
+        .file-type {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #e9ecef;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📁 Servidor de Arquivos com QR Codes</h1>
+            <p>Base URL: <strong>
+                    <%= host %>
+                </strong></p>
+
+            <div class="controls">
+                <a href="/generate-all-qr" class="btn btn-success">🔄 Gerar Todos os QR Codes</a>
+                <a href="/" class="btn">🔄 Atualizar Lista</a>
+            </div>
+        </div>
+
+        <div class="file-grid">
+            <% files.forEach(file=> { %>
+                <div class="file-card">
+                    <div class="file-name">
+                        <%= file.name %>
+                            <span class="file-type">
+                                <% if (file.fileType==='video' ) { %>🎥<% } %>
+                                <% if (file.fileType==='image' ) { %>🖼️<% } %>
+                                <% if (file.fileType==='pdf' ) { %>📄<% } %>
+                                <%= file.type %>
+                            </span>
+                    </div>
+                    <div class="file-url">
+                        <%= file.fullUrl %>
+                    </div>
+
+                    <% if (file.qrCode) { %>
+                        <div class="qr-code">
+                            <img src="<%= file.qrCode %>" alt="QR Code para <%= file.name %>">
+                            <div style="margin-top: 10px;">
+                                <a href="<%= file.qrCode %>" download class="btn">📥 Download QR</a>
+                            </div>
+                        </div>
+                        <% } else { %>
+                            <div class="no-qr">
+                                <p>QR Code não gerado</p>
+                                <a href="/generate-qr/<%= file.name %>" class="btn">🎯 Gerar QR Code</a>
+                            </div>
+                            <% } %>
+
+                                <div style="margin-top: 15px;">
+                                    <a href="<%= file.url %>" class="btn" target="_blank">🔗 Abrir Arquivo</a>
+                                </div>
+                </div>
+                <% }); %>
+        </div>
+    </div>
+</body>
+
+</html>

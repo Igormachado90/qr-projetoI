@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Player de Mídia</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        .file-info {
+            background: #34495e;
+            padding: 10px 20px;
+            color: #ecf0f1;
+            font-size: 0.9em;
+        }
+        .media-container {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        /* Player de Vídeo */
+        .video-player {
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        .video-player video {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Visualizador de Imagem */
+        .image-viewer img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Visualizador de PDF */
+        .pdf-viewer {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .controls {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .btn-download {
+            background: #27ae60;
+        }
+        .btn-download:hover {
+            background: #219a52;
+        }
+        .btn-back {
+            background: #95a5a6;
+        }
+        .btn-back:hover {
+            background: #7f8c8d;
+        }
+        
+        .file-type-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><%= title %></h1>
+            <div class="file-info">
+                Arquivo: <%= filename %> 
+                <span class="file-type-badge">
+                    <% if (fileType === 'video') { %>🎥 VÍDEO<% } %>
+                    <% if (fileType === 'image') { %>🖼️ IMAGEM<% } %>
+                    <% if (fileType === 'pdf') { %>📄 PDF<% } %>
+                </span>
+                • Tamanho: <%= fileSize %> MB
+            </div>
+        </div>
+        
+        <div class="media-container">
+            <% if (fileType === 'video') { %>
+                <div class="video-player">
+                    <video controls playsinline>
+                        <source src="<%= fileUrl %>" type="video/mp4">
+                        Seu navegador não suporta o elemento de vídeo.
+                    </video>
+                </div>
+            <% } %>
+            
+            <% if (fileType === 'image') { %>
+                <div class="image-viewer">
+                    <img src="<%= fileUrl %>" alt="<%= filename %>">
+                </div>
+            <% } %>
+            
+            <% if (fileType === 'pdf') { %>
+                <div class="pdf-viewer">
+                    <embed src="<%= fileUrl %>" type="application/pdf" width="100%" height="100%">
+                </div>
+            <% } %>
+            
+            <% if (fileType === 'other') { %>
+                <div style="padding: 40px; text-align: center;">
+                    <h3>📎 Arquivo: <%= filename %></h3>
+                    <p>Este tipo de arquivo é melhor visualizado através do download.</p>
+                </div>
+            <% } %>
+        </div>
+        
+        <!-- <div class="controls">
+            <a href="<%= fileUrl %>" download class="btn btn-download">📥 Download</a>
+            <a href="/" class="btn btn-back">📁 Voltar para Lista</a>
+            <a href="<%= fileUrl %>" target="_blank" class="btn">🔗 Abrir Direto</a>
+        </div> -->
+    </div>
+
+    <script>
+        // Configuração automática do vídeo
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.querySelector('video');
+            if (video) {
+                video.addEventListener('loadedmetadata', function() {
+                    console.log('Duração do vídeo:', formatTime(video.duration));
+                });
+            }
+            
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+        });
+    </script>
+</body>
+</html>
