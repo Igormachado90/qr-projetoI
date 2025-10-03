@@ -3,14 +3,17 @@ const path = require('path');
 const QRCode = require('qrcode');
 
 // Configurações
-const HOST = process.env.HOST || 'http://192.168.18.8:3000';
+// Se rodar local: HOST = http://localhost:3000
+// Se rodar na rede local: HOST = http://192.168.18.8:3000
+// Se no Vercel: ele usaria process.env.VERCEL_URL (https://seu-site.vercel.app)
+const HOST = process.env.HOST || 'http://qr-projeto-i.vercel.app';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const QR_CODES_DIR = path.join(__dirname, 'qrcodes');
 
 // Garante que a pasta de QR Codes existe
 if (!fs.existsSync(QR_CODES_DIR)) {
     fs.mkdirSync(QR_CODES_DIR, { recursive: true });
-    console.log('📁 Pasta qrcodes criada');
+    console.log('📁 Pasta public/qrcodes criada');
 }
 
 // Função para detectar tipo de arquivo
@@ -31,7 +34,8 @@ async function generateQRCodes() {
     try {
         console.log('🔍 Procurando arquivos na pasta public...');
 
-        const files = fs.readdirSync(PUBLIC_DIR);
+        const files = fs.readdirSync(PUBLIC_DIR)
+            .filter(f => f !== 'qrcodes') // Ignora a pasta de QR Codes;
 
         if (files.length === 0) {
             console.log('❌ Nenhum arquivo encontrado na pasta public/');
@@ -39,12 +43,12 @@ async function generateQRCodes() {
         }
 
         console.log(`📄 Encontrados ${files.length} arquivos:`);
-
         const results = [];
 
         for (const file of files) {
             const fileType = getFileType(file);
-            const mediaUrl = `${HOST}/media/${file}`;
+
+            const mediaUrl = `${HOST}/media/${encodeURIComponent(file)}`;
             const qrFilename = path.basename(file, path.extname(file)) + '.png';
             const qrPath = path.join(QR_CODES_DIR, qrFilename);
 
@@ -60,7 +64,7 @@ async function generateQRCodes() {
                     },
                     width: 300,
                     margin: 1,
-                    // errorCorrectionLevel: 'H'
+                    errorCorrectionLevel: 'H'
                 });
 
                 console.log(`   ✅ QR Code salvo: ${qrFilename}`);
@@ -75,7 +79,7 @@ async function generateQRCodes() {
             } catch (error) {
                 console.log(`   ❌ Erro ao gerar QR Code: ${error.message}`);
                 results.push({
-                    file: file,
+                    file,
                     status: 'ERRO',
                     error: error.message
                 });
@@ -87,9 +91,9 @@ async function generateQRCodes() {
         console.log('='.repeat(50));
         results.forEach(result => {
             if (result.status === 'SUCESSO') {
-                console.log(`✅ ${result.file.padEnd(30)} [${result.type.toUpperCase().padEnd(6)}] -> ${result.qrCode}`);
+                console.log(`✅ ${result.file.padEnd(25)} [${result.type.toUpperCase().padEnd(6)}] -> ${result.qrCode}`);
             } else {
-                console.log(`❌ ${result.file.padEnd(30)} -> ERRO: ${result.error}`);
+                console.log(`❌ ${result.file.padEnd(25)} -> ERRO: ${result.error}`);
             }
         });
 

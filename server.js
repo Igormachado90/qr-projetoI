@@ -5,7 +5,7 @@ const QRCode = require('qrcode');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'http://192.168.18.8:' + PORT;
+const HOST = process.env.HOST || 'http://qr-projeto-i.vercel.app';
 
 // Configurações
 app.set('view engine', 'ejs');
